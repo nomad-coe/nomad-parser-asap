@@ -25,7 +25,7 @@ def c(value, unit=None):
 
 parser_info = {"name": "parser_asap", "version": "1.0"}
 path = '../../../../nomad-meta-info/meta_info/nomad_meta_info/' +\
-        'gpaw.nomadmetainfo.json'
+        'asap.nomadmetainfo.json'
 metaInfoPath = os.path.normpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), path))
 
@@ -43,7 +43,7 @@ def parse(filename):
 
     with o(p, 'section_run'):
         p.addValue('program_name', 'ASAP')
-        p.addValue('program_version', '1.0.0')
+        p.addValue('program_version', 'unknown')
         with o(p, 'section_topology'):
             p.addValue('topology_force_field_name', 'EMT')
             with o(p, 'section_constraint'):
