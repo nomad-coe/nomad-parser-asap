@@ -1,0 +1,3 @@
+Asap is a library that outputs ASE trajectory files (.traj).
+The Asap developers has been asked to output more information to these files,
+so that they will be more useful for the Nomad database.
