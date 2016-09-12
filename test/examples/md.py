@@ -3,6 +3,7 @@ from __future__ import print_function
 from ase.lattice.cubic import FaceCenteredCubic
 from ase.md.langevin import Langevin
 from ase.io.trajectory import Trajectory
+from ase.constraints  import FixedPlane
 from ase import units
 
 #from asap3 import EMT  # Way too slow with ase.EMT !
@@ -17,6 +18,9 @@ atoms = FaceCenteredCubic(directions=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
                           size=(size, size, size),
                           pbc=False)
 
+n = 1
+cs = [FixedPlane(a, [0, 0, 1]) for a in range(1)]
+#atoms.set_constraint(cs)
 # Describe the interatomic interactions with the Effective Medium Theory
 atoms.set_calculator(EMT())
 
@@ -41,4 +45,4 @@ dyn.attach(traj.write, interval=50)
 
 # Now run the dynamics
 printenergy()
-dyn.run(5000)
+dyn.run(500)

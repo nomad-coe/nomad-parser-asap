@@ -19,6 +19,7 @@ def open_section(p, name):
 
 def c(value, unit=None):
     """ Dummy function for unit conversion"""
+    return value
     return cu(value, unit)
 
 
@@ -44,25 +45,25 @@ def parse(filename):
         p.addValue('program_name', 'ASAP')
         p.addValue('program_version', '1.0.0')
         with o(p, 'section_system'):
-            p.addArrayValues('simulation_cell', c(r.UnitCell, 'bohr'))
-            symbols = np.array([chemical_symbols[z] for z in r.AtomicNumbers])
+            p.addArrayValues('simulation_cell', c(r.cell, 'angstrom'))
+            symbols = np.array([chemical_symbols[z] for z in r.numbers])
             p.addArrayValues('atom_labels', symbols)
-            p.addArrayValues('atom_positions', c(r.CartesianPositions, 'bohr'))
+            p.addArrayValues('atom_positions', c(r.positions, 'angstrom'))
             p.addArrayValues('configuration_periodic_dimensions',
-                             np.array(r.BoundaryConditions, bool))
+                             np.array(r.pbc, bool))
         with o(p, 'section_sampling_method'):
             p.addValue('ensemble_type', 'NVE')
         with o(p, 'section_frame_sequence'):
             pass
-        with o(p, 'section_single_configuration_calculation'):
-            p.addRealValue('energy_total', c(r.Epot, 'hartree'))
-            p.addRealValue('energy_correction_entropy', c(r.S, 'hartree'))
-            if 'CartesianForces' in r:
-                p.addArrayValues('atom_forces_free',
-                                 c(r.CartesianForces, 'bohr/hartree'))
-            with o(p, 'section_method'):
-                pass
-                #p.addValue('x_asap_electronic_structure_method', 'EMT')
+        for f in r:
+            with o(p, 'section_single_configuration_calculation'):
+                p.addRealValue('energy_total',
+                               c(f.calculator.energy, 'eV'))
+                p.addArrayValues('atom_forces',
+                                 c(f.calculator.forces, 'angstrom/eV'))
+        with o(p, 'section_method'):
+            pass
+                # p.addValue('x_asap_electronic_structure_method', 'EMT')
     p.finishedParsingSession("ParseSuccess", None)
 
 if __name__ == '__main__':
