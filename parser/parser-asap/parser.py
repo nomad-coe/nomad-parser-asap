@@ -13,7 +13,7 @@ from nomadcore.parser_backend import JsonParseEventsWriterBackend
 @contextmanager
 def open_section(p, name):
     gid = p.openSection(name)
-    yield
+    yield gid
     p.closeSection(name, gid)
 
 
@@ -53,9 +53,11 @@ def parse(filename):
                     p.addArrayValues('constraint_atoms',
                                      np.asarray(indices))
                     p.addValue('constraint_kind', get_nomad_name(constraint))
+        with o(p, 'section_method') as method_gid:
+            p.addValue('calculation_method', 'EMT')
         with o(p, 'section_frame_sequence'):
             for f in t:
-                with o(p, 'section_system'):
+                with o(p, 'section_system') as system_gid:
                     p.addArrayValues('simulation_cell',
                                      f.get_cell(),
                                      'angstrom')
@@ -68,6 +70,10 @@ def parse(filename):
                                      f.get_pbc())
                     p.addArrayValues('atom_velocities', f.get_velocities())
                 with o(p, 'section_single_configuration_calculation'):
+                    p.addValue('single_configuration_to_calculation_method_ref',
+                                method_gid)
+                    p.addValue('single_configuration_calculation_to_system_ref',
+                                system_gid)
                     p.addRealValue('energy_total',
                                    c(f.get_total_energy(), 'eV'))
                     p.addArrayValues('atom_forces',
@@ -75,9 +81,7 @@ def parse(filename):
 
         with o(p, 'section_sampling_method'):
             p.addValue('ensemble_type', 'NVE')
-        with o(p, 'section_method'):
-            pass
-            # p.addValue('x_asap_electronic_structure_method', 'EMT')
+                       # p.addValue('x_asap_electronic_structure_method', 'EMT')
     p.finishedParsingSession("ParseSuccess", None)
 
 if __name__ == '__main__':
