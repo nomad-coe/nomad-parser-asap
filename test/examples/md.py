@@ -20,7 +20,7 @@ atoms = FaceCenteredCubic(directions=[[1, 0, 0], [0, 1, 0], [0, 0, 1]],
 
 n = 1
 cs = [FixedPlane(a, [0, 0, 1]) for a in range(1)]
-#atoms.set_constraint(cs)
+atoms.set_constraint(cs)
 # Describe the interatomic interactions with the Effective Medium Theory
 atoms.set_calculator(EMT())
 
@@ -40,7 +40,7 @@ def printenergy(a=atoms):  # store a reference to atoms in the definition.
 dyn.attach(printenergy, interval=50)
 
 # We also want to save the positions of all atoms after every 100th time step.
-traj = Trajectory('moldyn2.traj', 'w', atoms)
+traj = Trajectory('moldyn1.traj', 'w', atoms)
 dyn.attach(traj.write, interval=50)
 
 # Now run the dynamics
