@@ -64,20 +64,17 @@ def parse(filename):
             for f in t:
                 with o(p, 'section_system') as system_gid:
                     p.addArrayValues('simulation_cell',
-                                     f.get_cell(),
-                                     'angstrom')
+                                     c(f.get_cell(), 'angstrom'))
                     p.addArrayValues('atom_labels',
                                      np.asarray(f.get_chemical_symbols()))
                     p.addArrayValues('atom_positions',
-                                     c(f.get_positions(),
-                                       'angstrom'))
+                                     c(f.get_positions(), 'angstrom'))
                     p.addArrayValues('configuration_periodic_dimensions',
                                      f.get_pbc())
                     p.addArrayValues('atom_velocities',
                                      c(f.get_velocities() * units.fs /
                                        units.Angstrom,
                                        'angstrom/femtosecond'))
-                    p.addArrayValues('atom_velocities', f.get_velocities())
                 with o(p, 'section_single_configuration_calculation'):
                     mref = 'single_configuration_to_calculation_method_ref'
                     sref = 'single_configuration_calculation_to_system_ref'
