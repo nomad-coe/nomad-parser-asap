@@ -87,10 +87,10 @@ def parse(filename):
                                    c(f.get_total_energy(), 'eV'))
                     p.addArrayValues('atom_forces',
                                      c(f.get_forces(),
-                                       'angstrom/eV'))
+                                       'eV/angstrom'))
                     p.addArrayValues('atom_forces_raw',
                                      c(f.get_forces(apply_constraint=False),
-                                       'angstrom/eV'))
+                                       'eV/angstrom'))
         with o(p, 'section_sampling_method'):
             p.addValue('ensemble_type', 'NVE')
     p.finishedParsingSession("ParseSuccess", None)
