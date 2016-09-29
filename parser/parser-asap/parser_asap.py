@@ -48,9 +48,13 @@ def parse(filename):
         with o(p, 'section_topology'):
             p.addValue('topology_force_field_name', 'EMT')
             with o(p, 'section_constraint'):  # assuming constraints do not
-                indices = []                  # change from frame to frame
+                #indices = []                  # change from frame to frame
                 for constraint in t[0].constraints:
-                    indices.extend(constraint.get_indices())
+                    d = constraint.todict()['kwargs']
+                    if 'a' in d:
+                        indices = np.array([d['a']])
+                    else:
+                        indices = d['indices']
                     p.addArrayValues('constraint_atoms',
                                      np.asarray(indices))
                     p.addValue('constraint_kind', get_nomad_name(constraint))
