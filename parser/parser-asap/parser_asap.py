@@ -37,14 +37,27 @@ metaInfoEnv, warns = loadJsonFile(filePath=metaInfoPath,
 
 
 def parse(filename):
+    t = Trajectory(filename, 'r')
+    # some sanity checks
+    if hasattr(t.backend, 'calculator'):
+        if t.backend.calculator.get('name') != 'emt':  # Asap reports 'emt'!
+            return
+
+    if hasattr(t, 'description'):  # getting ready for improved traj format
+        ds = t.description
+    else:
+        ds = {}
+
     p = JsonParseEventsWriterBackend(metaInfoEnv)
     o = open_section
-    t = Trajectory(filename, 'r')
     p.startedParsingSession(filename, parser_info)
-
     with o(p, 'section_run'):
         p.addValue('program_name', 'ASAP')
-        p.addValue('program_version', 'unknown')
+        if hasattr(t, 'ase_version'):
+            aversion = t.ase_version
+        else:
+            aversion = 3  # default Asap version
+        p.addValue('program_version', aversion)
         with o(p, 'section_topology'):
             p.addValue('topology_force_field_name', 'EMT')
             with o(p, 'section_constraint'):  # assuming constraints do not
@@ -61,7 +74,7 @@ def parse(filename):
         with o(p, 'section_method') as method_gid:
             p.addValue('calculation_method', 'EMT')
         with o(p, 'section_frame_sequence'):
-            for f in t:
+            for f in t:  # loop over frames
                 with o(p, 'section_system') as system_gid:
                     p.addArrayValues('simulation_cell',
                                      c(f.get_cell(), 'angstrom'))
@@ -89,7 +102,21 @@ def parse(filename):
                                      c(f.get_forces(apply_constraint=False),
                                        'eV/angstrom'))
         with o(p, 'section_sampling_method'):
-            p.addValue('ensemble_type', 'NVE')
+            ensemble_type = 'NVE'  # default ensemble_type
+            if ds:  # if there is a traj.description
+                print('d:', ds)
+                if ds['type'] == 'optimization':
+                    p.addValue('geometry_optimization_method', ds['optimizer'])
+                elif d['type'] == 'molecular-dynamics':
+                    md_type = ds['md-type']
+                    if 'Langevin' in md_type or 'NVT' in md_type:
+                        ensemble_type = 'NVT'
+                    elif 'Verlet' in md_type:
+                        ensemble_type = 'NVE'
+                    elif 'NPT' in md_type:
+                        ensemble_type = 'NPT'
+            p.addValue('ensemble_type', ensemble_type)
+
     p.finishedParsingSession("ParseSuccess", None)
 
 if __name__ == '__main__':
