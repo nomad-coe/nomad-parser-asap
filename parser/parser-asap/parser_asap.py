@@ -56,7 +56,7 @@ def parse(filename):
         if hasattr(t, 'ase_version'):
             aversion = t.ase_version
         else:
-            aversion = 3  # default Asap version
+            aversion = '3'  # default Asap version
         p.addValue('program_version', aversion)
         with o(p, 'section_topology'):
             p.addValue('topology_force_field_name', 'EMT')
