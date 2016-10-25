@@ -85,10 +85,11 @@ def parse(filename):
                                      c(f.get_positions(), 'angstrom'))
                     p.addArrayValues('configuration_periodic_dimensions',
                                      f.get_pbc())
-                    p.addArrayValues('atom_velocities',
-                                     c(f.get_velocities() * units.fs /
-                                       units.Angstrom,
-                                       'angstrom/femtosecond'))
+                    if f.get_velocities() is not None:
+                        p.addArrayValues('atom_velocities',
+                                         c(f.get_velocities() * units.fs /
+                                           units.Angstrom,
+                                           'angstrom/femtosecond'))
                 with o(p, 'section_single_configuration_calculation'):
                     mref = 'single_configuration_to_calculation_method_ref'
                     sref = 'single_configuration_calculation_to_system_ref'
