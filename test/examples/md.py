@@ -6,8 +6,8 @@ from ase.io.trajectory import Trajectory
 from ase.constraints  import FixedPlane
 from ase import units
 
-#from asap3 import EMT  # Way too slow with ase.EMT !
-from ase.calculators.emt import EMT
+from asap3 import EMT  # Way too slow with ase.EMT !
+#from ase.calculators.emt import EMT
 size = 2
 
 T = 1500  # Kelvin
@@ -41,7 +41,7 @@ dyn.attach(printenergy, interval=50)
 
 # We also want to save the positions of all atoms after every 100th time step.
 traj = Trajectory('moldyn1.traj', 'w', atoms)
-dyn.attach(traj.write, interval=50)
+dyn.attach(traj, interval=50)
 
 # Now run the dynamics
 printenergy()
