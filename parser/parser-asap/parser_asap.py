@@ -95,14 +95,25 @@ def parse(filename):
                     sref = 'single_configuration_calculation_to_system_ref'
                     p.addValue(mref, method_gid)
                     p.addValue(sref, system_gid)
-                    p.addRealValue('energy_total',
-                                   c(f.get_total_energy(), 'eV'))
-                    p.addArrayValues('atom_forces',
-                                     c(f.get_forces(),
-                                       'eV/angstrom'))
-                    p.addArrayValues('atom_forces_raw',
-                                     c(f.get_forces(apply_constraint=False),
-                                       'eV/angstrom'))
+                    try:
+                        p.addRealValue('energy_total',
+                                    c(f.get_total_energy(), 'eV'))
+                    except:
+                        pass
+
+                    try:
+                        p.addArrayValues('atom_forces',
+                                         c(f.get_forces(),
+                                           'eV/angstrom'))
+                    except:
+                        pass
+
+                    try:
+                        p.addArrayValues('atom_forces_raw',
+                                         c(f.get_forces(apply_constraint=False),
+                                           'eV/angstrom'))
+                    except:
+                        pass
         with o(p, 'section_sampling_method'):
             ensemble_type = 'NVE'  # default ensemble_type
             if ds:  # if there is a traj.description
@@ -116,7 +127,10 @@ def parse(filename):
                                ds['optimizer'].lower())
                 elif ds['type'] == 'molecular-dynamics':
                     p.addValue('sampling_method', 'molecular_dynamics')
-                    p.addRealValue('x_asap_temperature', ds['temperature'])
+                    try:
+                        p.addRealValue('x_asap_temperature', ds['temperature'])
+                    except:
+                        pass
                     md_type = ds['md-type']
                     if 'Langevin' in md_type:
                         p.addValue('x_asap_langevin_friction', ds['friction'])
