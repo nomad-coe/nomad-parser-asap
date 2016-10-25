@@ -16,5 +16,11 @@ object AsapParserSpec extends Specification {
     "test moldyn2 with json" >> {
       ParserRun.parse(AsapParser, "parsers/asap/test/examples/moldyn2.traj", "json") must_== ParseResult.ParseSuccess
     }
+    "test geo_opt1 with json-events" >> {
+      ParserRun.parse(AsapParser, "parsers/asap/test/examples/geo_opt1.traj", "json-events") must_== ParseResult.ParseSuccess
+    }
+    "test geo_opt1 with json" >> {
+      ParserRun.parse(AsapParser, "parsers/asap/test/examples/geo_opt1.traj", "json") must_== ParseResult.ParseSuccess
+    }
   }
 }
