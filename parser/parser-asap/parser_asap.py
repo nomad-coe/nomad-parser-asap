@@ -104,7 +104,6 @@ def parse(filename):
                                      c(f.get_forces(apply_constraint=False),
                                        'eV/angstrom'))
         with o(p, 'section_sampling_method'):
-            ds = t.description
             ensemble_type = 'NVE'  # default ensemble_type
             if ds:  # if there is a traj.description
                 if 'timestep' in ds:  # timestep in MD
