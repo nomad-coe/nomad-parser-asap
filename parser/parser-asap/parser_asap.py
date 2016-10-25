@@ -56,10 +56,11 @@ def parse(filename):
         if hasattr(t, 'ase_version'):
             aversion = t.ase_version
         else:
-            aversion = '3'  # default Asap version
+            aversion = '3.x.x'  # default Asap version
         p.addValue('program_version', aversion)
         with o(p, 'section_topology'):
-            p.addValue('topology_force_field_name', 'EMT')
+            ffn = t[0].calc.name  # maybe get it from asap3.todict method?
+            p.addValue('topology_force_field_name', ffn)
             with o(p, 'section_constraint'):  # assuming constraints do not
                 #indices = []                  # change from frame to frame
                 for constraint in t[0].constraints:
@@ -72,7 +73,7 @@ def parse(filename):
                                      np.asarray(indices))
                     p.addValue('constraint_kind', get_nomad_name(constraint))
         with o(p, 'section_method') as method_gid:
-            p.addValue('calculation_method', 'EMT')
+            p.addValue('calculation_method', ffn)
         with o(p, 'section_frame_sequence'):
             for f in t:  # loop over frames
                 with o(p, 'section_system') as system_gid:
@@ -102,14 +103,25 @@ def parse(filename):
                                      c(f.get_forces(apply_constraint=False),
                                        'eV/angstrom'))
         with o(p, 'section_sampling_method'):
+            ds = t.description
             ensemble_type = 'NVE'  # default ensemble_type
             if ds:  # if there is a traj.description
-                print('d:', ds)
+                if 'timestep' in ds:  # timestep in MD
+                    p.addRealValue('x_asap_timestep', ds['timestep'])
+                if 'maxstep' in ds:  # maxstep in relaxation
+                    p.addRealValue('x_asap_maxstep', ds['maxstep'])
                 if ds['type'] == 'optimization':
-                    p.addValue('geometry_optimization_method', ds['optimizer'])
-                elif d['type'] == 'molecular-dynamics':
+                    p.addValue('sampling_method', 'geometry_optimization')
+                    p.addValue('geometry_optimization_method',
+                               ds['optimizer'].lower())
+                elif ds['type'] == 'molecular-dynamics':
+                    p.addValue('sampling_method', 'molecular_dynamics')
+                    p.addRealValue('x_asap_temperature', ds['temperature'])
                     md_type = ds['md-type']
-                    if 'Langevin' in md_type or 'NVT' in md_type:
+                    if 'Langevin' in md_type:
+                        p.addValue('x_asap_langevin_friction', ds['friction'])
+                        ensemble_type = 'NVT'
+                    elif 'NVT' in md_type:
                         ensemble_type = 'NVT'
                     elif 'Verlet' in md_type:
                         ensemble_type = 'NVE'
