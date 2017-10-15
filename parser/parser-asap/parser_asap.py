@@ -53,7 +53,7 @@ def parse(filename):
     p.startedParsingSession(filename, parser_info)
     with o(p, 'section_run'):
         p.addValue('program_name', 'ASAP')
-        if hasattr(t, 'ase_version'):
+        if hasattr(t, 'ase_version') and t.ase_version:
             aversion = t.ase_version
         else:
             aversion = '3.x.x'  # default Asap version
