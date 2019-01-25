@@ -75,17 +75,18 @@ def parse(filename):
         with o(p, 'section_topology'):
             ffn = t[0].calc.name  # maybe get it from asap3.todict method?
             p.addValue('topology_force_field_name', ffn)
-            with o(p, 'section_constraint'):  # assuming constraints do not
-                #indices = []                  # change from frame to frame
+            with o(p, 'section_constraints'):
+                           #indices = []                  # change from frame to frame
                 for constraint in t[0].constraints:
-                    d = constraint.todict()['kwargs']
-                    if 'a' in d:
-                        indices = np.array([d['a']])
-                    else:
-                        indices = d['indices']
-                    p.addArrayValues('constraint_atoms',
-                                     np.asarray(indices))
-                    p.addValue('constraint_kind', get_nomad_name(constraint))
+                    with o(p, 'section_constraint'):  # assuming constraints do not
+                        d = constraint.todict()['kwargs']
+                        if 'a' in d:
+                            indices = np.array([d['a']])
+                        else:
+                            indices = d['indices']
+                        p.addArrayValues('constraint_atoms',
+                                         np.asarray(indices))
+                        p.addValue('constraint_kind', get_nomad_name(constraint))
         with o(p, 'section_method') as method_gid:
             p.addValue('calculation_method', ffn)
         with o(p, 'section_frame_sequence'):
@@ -117,7 +118,7 @@ def parse(filename):
 
                     try:
                         fId = p.openSection('section_atom_forces')
-                        p.addValue('atom_foreces_constraints', 'clean')
+                        p.addValue('atom_forces_constraints', 'clean')
                         p.addArrayValues('atom_forces',
                                          c(f.get_forces(),
                                            'eV/angstrom'))
@@ -127,7 +128,7 @@ def parse(filename):
 
                     try:
                         fId = p.openSection('section_atom_forces')
-                        p.addValue('atom_foreces_constraints', 'raw')
+                        p.addValue('atom_forces_constraints', 'raw')
                         p.addArrayValues('atom_forces',
                                          c(f.get_forces(apply_constraint=False),
                                            'eV/angstrom'))
