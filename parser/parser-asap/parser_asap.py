@@ -105,7 +105,7 @@ def parse(filename):
                                            units.Angstrom,
                                            'angstrom/femtosecond'))
                 with o(p, 'section_single_configuration_calculation'):
-                    mref = 'single_configuration_to_calculation_method_ref'
+                    mref = 'single_configuration_calculation_to_method_ref'
                     sref = 'single_configuration_calculation_to_system_ref'
                     p.addValue(mref, method_gid)
                     p.addValue(sref, system_gid)
@@ -116,16 +116,22 @@ def parse(filename):
                         pass
 
                     try:
+                        fId = p.openSection('section_atom_forces')
+                        p.addValue('atom_foreces_constraints', 'clean')
                         p.addArrayValues('atom_forces',
                                          c(f.get_forces(),
                                            'eV/angstrom'))
+                        p.closeSection('section_atom_forces', fId)
                     except:
                         pass
 
                     try:
-                        p.addArrayValues('atom_forces_raw',
+                        fId = p.openSection('section_atom_forces')
+                        p.addValue('atom_foreces_constraints', 'raw')
+                        p.addArrayValues('atom_forces',
                                          c(f.get_forces(apply_constraint=False),
                                            'eV/angstrom'))
+                        p.closeSection('section_atom_forces', fId)
                     except:
                         pass
         with o(p, 'section_sampling_method'):
