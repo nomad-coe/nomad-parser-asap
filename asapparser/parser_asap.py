@@ -1,11 +1,11 @@
 # Copyright 2016-2018 Mikkel Strange, Fawzi Mohamed
-# 
+#
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #   Unless required by applicable law or agreed to in writing, software
 #   distributed under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,11 +18,9 @@ from contextlib import contextmanager
 import numpy as np
 from ase.io.trajectory import Trajectory
 from ase import units
-import setup_paths
-from constraint_conversion import get_nomad_name
+from .constraint_conversion import get_nomad_name
 from nomadcore.unit_conversion.unit_conversion import convert_unit as cu
-from nomadcore.local_meta_info import loadJsonFile, InfoKindEl
-from nomadcore.parser_backend import JsonParseEventsWriterBackend
+import logging
 
 
 @contextmanager
@@ -39,18 +37,9 @@ def c(value, unit=None):
 
 
 parser_info = {"name": "parser_asap", "version": "1.0"}
-path = '../../../../nomad-meta-info/meta_info/nomad_meta_info/' +\
-        'asap.nomadmetainfo.json'
-metaInfoPath = os.path.normpath(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), path))
-
-metaInfoEnv, warns = loadJsonFile(filePath=metaInfoPath,
-                                  dependencyLoader=None,
-                                  extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS,
-                                  uri=None)
 
 
-def parse(filename):
+def parse(filename, backend):
     t = Trajectory(filename, 'r')
     # some sanity checks
     if hasattr(t.backend, 'calculator'):
@@ -62,7 +51,7 @@ def parse(filename):
     else:
         ds = {}
 
-    p = JsonParseEventsWriterBackend(metaInfoEnv)
+    p = backend
     o = open_section
     p.startedParsingSession(filename, parser_info)
     with o(p, 'section_run'):
@@ -159,7 +148,16 @@ def parse(filename):
 
     p.finishedParsingSession("ParseSuccess", None)
 
-if __name__ == '__main__':
-    import sys
-    filename = sys.argv[1]
-    parse(filename)
+
+class AsapParser():
+    """ A proper class envolop for running this parser from within python. """
+    def __init__(self, backend, **kwargs):
+        self.backend_factory = backend
+
+    def parse(self, mainfile):
+            logging.info('asap parser started')
+            logging.getLogger('nomadcore').setLevel(logging.WARNING)
+            backend = self.backend_factory("asap.nomadmetainfo.json")
+            parserInfo = parser_info
+            parse(mainfile, backend)
+            return backend
