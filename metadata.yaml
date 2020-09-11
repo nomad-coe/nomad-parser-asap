@@ -1,0 +1,7 @@
+codeLabel: ASAP
+codeLabelStyle: all in capitals
+codeUrl: https://wiki.fysik.dtu.dk/asap
+parserDirName: dependencies/parsers/asap/
+parserGitUrl: https://gitlab.mpcdf.mpg.de/nomad-lab/parser-asap
+parserSpecific: ''
+tableOfFiles: ''
