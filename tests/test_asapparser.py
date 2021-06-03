@@ -45,9 +45,9 @@ def test_geometry_optimization(parser):
     assert sec_topo.section_constraint[0].constraint_kind == 'fix_xy'
 
     sec_sccs = sec_run.section_single_configuration_calculation
-    assert sec_sccs[3].energy_total.magnitude == approx(7.51835442e-18)
-    assert sec_sccs[10].atom_forces[7][2].magnitude == approx(-3.72962848e-11)
-    assert sec_sccs[6].atom_forces_raw[2][0].magnitude == approx(2.54691322e-10)
+    assert sec_sccs[3].energy_total.value.magnitude == approx(7.51835442e-18)
+    assert sec_sccs[10].forces_total.value[7][2].magnitude == approx(-3.72962848e-11)
+    assert sec_sccs[6].forces_total.value_raw[2][0].magnitude == approx(2.54691322e-10)
 
     sec_systems = sec_run.section_system
     assert sec_systems[4].atom_positions[18][1].magnitude == approx(3.60873003e-10)

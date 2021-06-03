@@ -26,7 +26,7 @@ from nomad.units import ureg
 from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser import FileParser
 from nomad.datamodel.metainfo.common_dft import Run, Topology, Constraint, Method, System,\
-    SingleConfigurationCalculation, SamplingMethod
+    SingleConfigurationCalculation, SamplingMethod, Energy, Forces
 
 
 class TrajParser(FileParser):
@@ -103,17 +103,15 @@ class AsapParser(FairdiParser):
         sec_scc = self.archive.section_run[0].m_create(SingleConfigurationCalculation)
 
         try:
-            sec_scc.energy_total = traj.get_total_energy() * ureg.eV
+            sec_scc.m_add_sub_section(SingleConfigurationCalculation.energy_total, Energy(
+                value=traj.get_total_energy() * ureg.eV))
         except Exception:
             pass
 
         try:
-            sec_scc.atom_forces = traj.get_forces() * (ureg.eV / ureg.angstrom)
-        except Exception:
-            pass
-
-        try:
-            sec_scc.atom_forces_raw = traj.get_forces(apply_constraint=False) * (ureg.eV / ureg.angstrom)
+            sec_forces = sec_scc.m_create(Forces, SingleConfigurationCalculation.forces_total)
+            sec_forces.value = traj.get_forces() * ureg.eV / ureg.angstrom
+            sec_forces.value_raw = traj.get_forces(apply_constraint=False) * ureg.eV / ureg.angstrom
         except Exception:
             pass
 
