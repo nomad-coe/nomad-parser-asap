@@ -36,34 +36,35 @@ def test_geometry_optimization(parser):
     archive = EntryArchive()
     parser.parse('tests/data/geo_opt1.traj', archive, None)
 
-    sec_run = archive.section_run[0]
-    assert sec_run.program_version == '3.13.0b1'
+    sec_run = archive.run[0]
+    assert sec_run.program.version == '3.13.0b1'
 
-    sec_topo = sec_run.section_topology[0]
-    assert sec_topo.topology_force_field_name == 'emt'
-    assert sec_topo.section_constraint[0].constraint_atoms == np.array(0)
-    assert sec_topo.section_constraint[0].constraint_kind == 'fix_xy'
+    sec_method = sec_run.method[0]
+    assert sec_method.force_field.model[0].name == 'emt'
 
-    sec_sccs = sec_run.section_single_configuration_calculation
-    assert sec_sccs[3].energy_total.value.magnitude == approx(7.51835442e-18)
-    assert sec_sccs[10].forces_total.value[7][2].magnitude == approx(-3.72962848e-11)
-    assert sec_sccs[6].forces_total.value_raw[2][0].magnitude == approx(2.54691322e-10)
+    sec_sccs = sec_run.calculation
+    assert sec_sccs[3].energy.total.value.magnitude == approx(7.51835442e-18)
+    assert sec_sccs[10].forces.total.value[7][2].magnitude == approx(-3.72962848e-11)
+    assert sec_sccs[6].forces.total.value_raw[2][0].magnitude == approx(2.54691322e-10)
 
-    sec_systems = sec_run.section_system
-    assert sec_systems[4].atom_positions[18][1].magnitude == approx(3.60873003e-10)
-    assert sec_systems[9].lattice_vectors[0][0].magnitude == approx(1.083e-09)
-    assert sec_systems[0].atom_labels[11] == 'Cu'
+    sec_systems = sec_run.system
+    assert sec_systems[4].atoms.positions[18][1].magnitude == approx(3.60873003e-10)
+    assert sec_systems[9].atoms.lattice_vectors[0][0].magnitude == approx(1.083e-09)
+    assert sec_systems[0].atoms.labels[11] == 'Cu'
+    assert sec_systems[0].constraint[0].indices == np.array(0)
+    assert sec_systems[0].constraint[0].kind == 'fix_xy'
 
 
 def test_molecular_dynamics(parser):
     archive = EntryArchive()
     parser.parse('tests/data/moldyn1.traj', archive, None)
 
-    sec_run = archive.section_run[0]
+    sec_run = archive.run[0]
 
-    sec_sampling = sec_run.section_sampling_method[0]
-    assert sec_sampling.sampling_method == 'molecular_dynamics'
-    assert sec_sampling.ensemble_type == 'NVT'
-    assert sec_sampling.x_asap_timestep == approx(0.4911347394232032)
+    sec_workfow = archive.workflow[0]
 
-    assert sec_run.section_system[8].atom_velocities[11][2].magnitude == approx(-1291.224)
+    assert sec_workfow.type == 'molecular_dynamics'
+    assert sec_workfow.molecular_dynamics.ensemble_type == 'NVT'
+    assert sec_workfow.molecular_dynamics.x_asap_timestep == approx(0.4911347394232032)
+
+    assert sec_run.system[8].atoms.velocities[11][2].magnitude == approx(-1291.224)
