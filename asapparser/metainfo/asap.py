@@ -25,6 +25,9 @@ from nomad.metainfo import (  # pylint: disable=unused-import
 from nomad.datamodel.metainfo import workflow
 
 
+m_package = Package()
+
+
 class MolecularDynamics(workflow.MolecularDynamics):
 
     m_def = Section(validate=False, extends_base_section=True)
@@ -61,4 +64,3 @@ class GeometryOptimization(workflow.GeometryOptimization):
         description='''
         Maxstep in Angstrom for geometry optimization
         ''')
-
