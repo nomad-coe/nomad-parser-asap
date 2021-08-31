@@ -25,12 +25,12 @@ from ase.io.trajectory import Trajectory
 from nomad.units import ureg
 from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser import FileParser
-from nomad.datamodel.metainfo.run.run import Run, Program
-from nomad.datamodel.metainfo.run.method import (
-    Method, MethodReference, ForceField, Model)
-from nomad.datamodel.metainfo.run.system import (
-    System, Atoms, SystemReference, Constraint)
-from nomad.datamodel.metainfo.run.calculation import (
+from nomad.datamodel.metainfo.simulation.run import Run, Program
+from nomad.datamodel.metainfo.simulation.method import (
+    Method, ForceField, Model)
+from nomad.datamodel.metainfo.simulation.system import (
+    System, Atoms, Constraint)
+from nomad.datamodel.metainfo.simulation.calculation import (
     Calculation, Energy, EnergyEntry, Forces, ForcesEntry)
 from nomad.datamodel.metainfo.workflow import (
     Workflow, GeometryOptimization, MolecularDynamics)
@@ -175,5 +175,5 @@ class AsapParser(FairdiParser):
             self.parse_scc(traj)
             # add references to scc
             sec_scc = sec_run.calculation[-1]
-            sec_scc.method_ref.append(MethodReference(value=sec_run.method[-1]))
-            sec_scc.system_ref.append(SystemReference(value=sec_run.system[-1]))
+            sec_scc.method_ref = sec_run.method[-1]
+            sec_scc.system_ref = sec_run.system[-1]
