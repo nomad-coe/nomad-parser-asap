@@ -45,7 +45,7 @@ class TrajParser(FileParser):
         if self._file_handler is None:
             self._file_handler = Trajectory(self.mainfile, 'r')
             # check if traj file is really asap
-            if hasattr(self._file_handler.backend, 'calculator'):
+            if 'calculator' in self._file_handler.backend.keys():
                 if self._file_handler.backend.calculator.name != 'emt':
                     self.logger.error('Trajectory is not ASAP.')
                     self._file_handler = None
@@ -123,7 +123,8 @@ class AsapParser(FairdiParser):
         traj = self.traj_parser.traj
         sec_method = self.archive.run[0].m_create(Method)
 
-        sec_method.force_field = ForceField(model=[Model(name=traj[0].calc.name)])
+        if traj[0].calc is not None:
+            sec_method.force_field = ForceField(model=[Model(name=traj[0].calc.name)])
 
         description = traj.description if hasattr(traj, 'description') else dict()
         if not description:
